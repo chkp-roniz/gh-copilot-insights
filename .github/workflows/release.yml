@@ -73,7 +73,9 @@ jobs:
       - name: Build binary
         run: |
           IFS="-" read -r os arch <<< "${{ matrix.os_arch }}"
-          GOOS=$os GOARCH=$arch go build -o gh-copilot-insights-$os-$arch${{ os == 'windows' && '.exe' || '' }}
+          ext=""
+          if [ "$os" == "windows" ]; then ext=".exe"; fi
+          GOOS=$os GOARCH=$arch go build -o gh-copilot-insights-$os-$arch$ext
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
