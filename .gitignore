@@ -1,0 +1,28 @@
+# Binaries for programs and plugins
+gh-copilot-insights
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build output
+*.test
+*.out
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.coverprofile
+
+# Go workspace file
+go.work
+
+# Go modules
+vendor/
+
+# IDE and editor directories
+.vscode/
+.idea/
+.devcontainer/
+
+# Dependency directories
+node_modules/
