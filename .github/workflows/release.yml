@@ -14,8 +14,52 @@ jobs:
 
     strategy:
       matrix:
-        os: [windows, linux, darwin]
-        arch: [amd64, 386]
+        os_arch: [
+          "aix-ppc64",
+          "android-386",
+          "android-amd64",
+          "android-arm",
+          "android-arm64",
+          "darwin-amd64",
+          "darwin-arm64",
+          "dragonfly-amd64",
+          "freebsd-386",
+          "freebsd-amd64",
+          "freebsd-arm",
+          "freebsd-arm64",
+          "illumos-amd64",
+          "ios-amd64",
+          "ios-arm64",
+          "js-wasm",
+          "linux-386",
+          "linux-amd64",
+          "linux-arm",
+          "linux-arm64",
+          "linux-mips",
+          "linux-mips64",
+          "linux-mips64le",
+          "linux-mipsle",
+          "linux-ppc64",
+          "linux-ppc64le",
+          "linux-riscv64",
+          "linux-s390x",
+          "netbsd-386",
+          "netbsd-amd64",
+          "netbsd-arm",
+          "netbsd-arm64",
+          "openbsd-386",
+          "openbsd-amd64",
+          "openbsd-arm",
+          "openbsd-arm64",
+          "openbsd-mips64",
+          "plan9-386",
+          "plan9-amd64",
+          "plan9-arm",
+          "solaris-amd64",
+          "windows-386",
+          "windows-amd64",
+          "windows-arm"
+        ]
 
     steps:
       - name: Checkout code
@@ -28,13 +72,14 @@ jobs:
 
       - name: Build binary
         run: |
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.os == 'windows' && '.exe' || '' }}
+          IFS="-" read -r os arch <<< "${{ matrix.os_arch }}"
+          GOOS=$os GOARCH=$arch go build -o gh-copilot-insights-$os-$arch${{ os == 'windows' && '.exe' || '' }}
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}
-          path: gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.os == 'windows' && '.exe' || '' }}
+          name: gh-copilot-insights-${{ matrix.os_arch }}
+          path: gh-copilot-insights-${{ matrix.os_arch }}${{ matrix.os_arch == 'windows-386' || matrix.os_arch == 'windows-amd64' || matrix.os_arch == 'windows-arm' && '.exe' || '' }}
 
   release:
     if: startsWith(github.ref, 'refs/tags/v') && github.event.repository.protected
@@ -45,15 +90,13 @@ jobs:
       - name: Download binaries
         uses: actions/download-artifact@v2
         with:
-          name: gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}
+          name: gh-copilot-insights-${{ matrix.os_arch }}
           path: .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            gh-copilot-insights-windows-amd64.exe
-            gh-copilot-insights-linux-amd64
-            gh-copilot-insights-darwin-amd64
+            gh-copilot-insights-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
