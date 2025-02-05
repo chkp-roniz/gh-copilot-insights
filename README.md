@@ -1,8 +1,8 @@
-# GitHub Copilot Insights
+# 🌟 GitHub Copilot Insights
 
 ## Objective
 
-The GitHub Copilot Insights plugin provides detailed metrics and insights into the usage and adoption of GitHub Copilot within an organization or enterprise. It helps organizations understand how effectively they are utilizing GitHub Copilot, identify areas for improvement, and measure the impact on productivity and ROI.
+The GitHub Copilot Insights gh extension provides detailed metrics and insights into the usage and adoption of GitHub Copilot within an organization or enterprise. It helps organizations understand how effectively they are utilizing GitHub Copilot, identify areas for improvement, and measure the impact on productivity and ROI.
 
 ## Insights
 
