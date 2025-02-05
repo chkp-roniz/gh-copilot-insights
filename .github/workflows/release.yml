@@ -11,140 +11,57 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - os: aix
-            arch: ppc64
-            runs-on: ubuntu-latest
-          - os: android
+          - os: ubuntu-latest
+            arch: amd64
+            goos: linux
+            goarch: amd64
+
+          - os: ubuntu-latest
+            arch: arm64
+            goos: linux
+            goarch: arm64
+
+          - os: ubuntu-latest
             arch: 386
-            runs-on: ubuntu-latest
-          - os: android
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: android
-            arch: arm
-            runs-on: ubuntu-latest
-          - os: android
-            arch: arm64
-            runs-on: ubuntu-latest
-          - os: darwin
-            arch: amd64
-            runs-on: macos-latest
-          - os: darwin
-            arch: arm64
-            runs-on: macos-latest
-          - os: dragonfly
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: freebsd
-            arch: 386
-            runs-on: ubuntu-latest
-          - os: freebsd
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: freebsd
-            arch: arm
-            runs-on: ubuntu-latest
-          - os: freebsd
-            arch: arm64
-            runs-on: ubuntu-latest
-          - os: illumos
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: ios
-            arch: amd64
-            runs-on: macos-latest
-          - os: ios
-            arch: arm64
-            runs-on: macos-latest
-          - os: js
-            arch: wasm
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: 386
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: arm
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: arm64
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: mips
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: mips64
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: mips64le
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: mipsle
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: ppc64
-            runs-on: ubuntu-latest
-          - os: linux
+            goos: linux
+            goarch: 386
+
+          - os: ubuntu-latest
             arch: ppc64le
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: riscv64
-            runs-on: ubuntu-latest
-          - os: linux
+            goos: linux
+            goarch: ppc64le
+
+          - os: ubuntu-latest
             arch: s390x
-            runs-on: ubuntu-latest
-          - os: netbsd
-            arch: 386
-            runs-on: ubuntu-latest
-          - os: netbsd
+            goos: linux
+            goarch: s390x
+
+          - os: windows-latest
             arch: amd64
-            runs-on: ubuntu-latest
-          - os: netbsd
-            arch: arm
-            runs-on: ubuntu-latest
-          - os: netbsd
+            goos: windows
+            goarch: amd64
+            ext: .exe
+
+          - os: windows-latest
+            arch: 386
+            goos: windows
+            goarch: 386
+            ext: .exe
+
+          - os: macos-latest
+            arch: amd64
+            goos: darwin
+            goarch: amd64
+
+          - os: macos-latest
             arch: arm64
-            runs-on: ubuntu-latest
-          - os: openbsd
-            arch: 386
-            runs-on: ubuntu-latest
-          - os: openbsd
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: openbsd
-            arch: arm
-            runs-on: ubuntu-latest
-          - os: openbsd
-            arch: arm64
-            runs-on: ubuntu-latest
-          - os: openbsd
-            arch: mips64
-            runs-on: ubuntu-latest
-          - os: plan9
-            arch: 386
-            runs-on: ubuntu-latest
-          - os: plan9
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: plan9
-            arch: arm
-            runs-on: ubuntu-latest
-          - os: solaris
-            arch: amd64
-            runs-on: ubuntu-latest
-          - os: windows
-            arch: 386
-            runs-on: windows-latest
-          - os: windows
-            arch: amd64
-            runs-on: windows-latest
-          - os: windows
-            arch: arm
-            runs-on: windows-latest
+            goos: darwin
+            goarch: arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -155,17 +72,16 @@ jobs:
         with:
           go-version: '1.17'
 
-      - name: Build binary
+     - name: Build
         run: |
-          ext=""
-          if [ "${{ matrix.os }}" == "windows" ]; then ext=".exe"; fi
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}$ext
+          OUTPUT="gh-copilot-insights-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}"
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o $OUTPUT
 
-      - name: Upload binary
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}
-          path: gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.os == 'windows' && '.exe' || '' }}
+          name: build-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: output-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}
 
   release:
     if: startsWith(github.ref, 'refs/tags/v') && github.event.repository.protected
