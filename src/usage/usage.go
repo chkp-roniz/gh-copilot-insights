@@ -3,6 +3,7 @@ package usage
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 
 	"github.com/chkp-roniz/gh-copilot-insights/src/api"
@@ -19,7 +20,7 @@ func PrintJSON(insights []api.Insight) {
 }
 
 func toPercentage(value float64) string {
-	return fmt.Sprintf("%.0f%%", value*100)
+	return fmt.Sprintf("%.0f%%", math.Min(value, 1)*100)
 }
 
 func printMetric(category, displayName, description string, value float64) {

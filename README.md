@@ -1,5 +1,7 @@
 # 🌟 GitHub Copilot Insights
 
+![GitHub Copilot Insights](gh-copilot-insights.gif)
+
 ## Objective
 
 The GitHub Copilot Insights gh extension provides detailed metrics and insights into the usage and adoption of GitHub Copilot within an organization or enterprise. It helps organizations understand how effectively they are utilizing GitHub Copilot, identify areas for improvement, and measure the impact on productivity and ROI.
