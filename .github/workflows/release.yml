@@ -89,15 +89,15 @@ jobs:
 
     steps:
       - name: Download binaries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: gh-copilot-insights-${{ matrix.os }}-${{ matrix.arch }}
-          path: .
+          path: artifacts
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: |
-            gh-copilot-insights-*
+          draft: false
+          prerelease: false
+          files: artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
