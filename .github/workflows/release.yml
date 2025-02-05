@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - main
-      - dev
 
 jobs:
   build:
@@ -86,7 +83,7 @@ jobs:
           path: gh-copilot-insights-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v') && github.event.repository.protected
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-latest
 
