@@ -7,7 +7,8 @@ import (
 
 	"github.com/chkp-roniz/gh-copilot-insights/src/api"
 	"github.com/chkp-roniz/gh-copilot-insights/src/usage"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
+	easy "github.com/t-tomalak/logrus-easy-formatter"
 )
 
 func main() {
@@ -18,10 +19,14 @@ func main() {
 	flag.Parse()
 
 	if *debug {
-		logrus.SetLevel(logrus.DebugLevel)
-		logrus.SetOutput(os.Stdout)
-		logrus.Debug("Debug mode enabled")
-		logrus.Debugf("Scope: %s, Output: %s, Extended: %v", *scope, *output, *extended)
+		logger.SetLevel(logger.DebugLevel)
+		logger.SetFormatter(&easy.Formatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+			LogFormat:       "%time% [%lvl%]: %msg%\n",
+		})
+		logger.SetOutput(os.Stdout)
+		logger.Debug("Debug mode enabled")
+		logger.Debugf("Scope: %s, Output: %s, Extended: %v", *scope, *output, *extended)
 	}
 
 	if *scope == "" {
@@ -33,7 +38,7 @@ func main() {
 	// Fetch Copilot usage insights
 	usageData, err := api.FetchCopilotUsage(*scope)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
+		logger.WithFields(logger.Fields{
 			"scope": *scope,
 		}).Debugf("Error: %v", err)
 		fmt.Println("Error fetching Copilot insights. Please try again.")
@@ -53,5 +58,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	logrus.Debug("Execution completed")
+	logger.Debug("Execution completed")
 }

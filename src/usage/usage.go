@@ -77,6 +77,9 @@ func PrintTable(insights []api.Insight, extended bool) {
 	table.SetHeader(headers)
 
 	for _, insight := range insights {
+		if len(insights) > 0 {
+			fmt.Printf("# GitHub Copilot Insights for %s (%s)\n\n", insight.ScopeName, insight.ScopeType)
+		}
 		appendMetric(table, "🚀 "+insight.AdoptionUtilization.SeatUtilizationRate.Category, insight.AdoptionUtilization.SeatUtilizationRate.DisplayName, insight.AdoptionUtilization.SeatUtilizationRate.Description, insight.AdoptionUtilization.SeatUtilizationRate.Value)
 		appendMetric(table, "🚀 "+insight.AdoptionUtilization.ActiveVsEngagedUsers.Category, insight.AdoptionUtilization.ActiveVsEngagedUsers.DisplayName, insight.AdoptionUtilization.ActiveVsEngagedUsers.Description, insight.AdoptionUtilization.ActiveVsEngagedUsers.Value)
 		appendMetric(table, "🚀 "+insight.AdoptionUtilization.IDEAdoption.Category, insight.AdoptionUtilization.IDEAdoption.DisplayName, insight.AdoptionUtilization.IDEAdoption.Description, insight.AdoptionUtilization.IDEAdoption.Value)

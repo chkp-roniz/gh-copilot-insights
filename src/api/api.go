@@ -4,49 +4,34 @@ import (
 	"fmt"
 
 	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/auth"
-
-	// "github.com/cli/go-gh/pkg/api"
-	"github.com/sirupsen/logrus"
+	"github.com/cli/go-gh/pkg/api"
+	logger "github.com/sirupsen/logrus"
 )
 
 func determineEndpoint(scope string) (string, error) {
-	// stdOut, stdErr, err := gh.Exec("auth", "token")
-	// if err != nil {
-	// 	logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
-	// 	logrus.Debugf("%s", stdErr.String())
-	// 	return "", err
-	// }
-	// opts := &api.ClientOptions{
-	// 	AuthToken: stdOut.String(),
-	// }
-	client, err := gh.RESTClient(nil)
-	token, source := auth.TokenForHost("github.com")
-	logrus.Debugf("Token: %s, Source: %s", token, source)
+	client, err := getRESTClient()
 	if err != nil {
-		logrus.Debugf("Error creating REST client: %v", err)
+		logger.Debugf("Error creating REST client: %v", err)
 		return "", err
 	}
 
 	// Check if the scope is an organization
 	orgEndpoint := fmt.Sprintf("orgs/%s", scope)
 	var orgResponse map[string]interface{}
-	err1 := client.Get(orgEndpoint, &orgResponse)
-	if err1 == nil && orgResponse != nil {
+	err = client.Get(orgEndpoint, &orgResponse)
+	if err == nil && orgResponse != nil {
 		return "orgs", nil
 	}
 
 	// Check if the scope is an enterprise
 	enterpriseEndpoint := fmt.Sprintf("enterprises/%s/properties/schema", scope)
 	var enterpriseResponse []map[string]interface{}
-	err2 := client.Get(enterpriseEndpoint, &enterpriseResponse)
-	if err2 == nil && enterpriseResponse != nil {
+	err = client.Get(enterpriseEndpoint, &enterpriseResponse)
+	if err == nil && enterpriseResponse != nil {
 		return "enterprises", nil
 	}
 
-	logrus.Debugf("Invalid scope: %s", scope)
-	logrus.Debugf("Error orgs: %v", err1)
-	logrus.Debugf("Error enterprises: %v", err1)
+	logger.Debugf("Invalid scope: %s", scope)
 	return "", fmt.Errorf("invalid scope: %s", scope)
 }
 
@@ -279,25 +264,25 @@ func getInsights(scopeName, scopeType string, usage []CopilotUsage, metrics []Co
 	}
 }
 
-func FetchCopilotUsage(scopeName string) ([]Insight, error) {
-	// stdOut, stdErr, err := gh.Exec("auth", "token")
-	// if err != nil {
-	// 	logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
-	// 	logrus.Debugf("%s", stdErr.String())
-	// 	return nil, err
-	// }
-	// opts := &api.ClientOptions{
-	// 	AuthToken: stdOut.String(),
-	// }
+func getRESTClient() (api.RESTClient, error) {
 	client, err := gh.RESTClient(nil)
 	if err != nil {
-		logrus.Debugf("Error creating REST client: %v", err)
+		logger.Debugf("Error creating REST client: %v", err)
+		return nil, err
+	}
+	return client, nil
+}
+
+func FetchCopilotUsage(scopeName string) ([]Insight, error) {
+	client, err := getRESTClient()
+	if err != nil {
+		logger.Debugf("Error creating REST client: %v", err)
 		return nil, err
 	}
 
 	scopeType, err := determineEndpoint(scopeName)
 	if err != nil {
-		logrus.Debugf("Error determining endpoint for scope %s: %v", scopeName, err)
+		logger.Debugf("Error determining endpoint for scope %s: %v", scopeName, err)
 		return nil, err
 	}
 
@@ -306,21 +291,21 @@ func FetchCopilotUsage(scopeName string) ([]Insight, error) {
 	var usage []CopilotUsage
 	err = client.Get(fmt.Sprintf("%s/usage", endpoint), &usage)
 	if err != nil {
-		logrus.Debugf("Error fetching usage data from endpoint %s: %v", endpoint, err)
+		logger.Debugf("Error fetching usage data from endpoint %s: %v", endpoint, err)
 		return nil, err
 	}
 
 	var metrics []CopilotMetrics
 	err = client.Get(fmt.Sprintf("%s/metrics", endpoint), &metrics)
 	if err != nil {
-		logrus.Debugf("Error fetching metrics data from endpoint %s: %v", endpoint, err)
+		logger.Debugf("Error fetching metrics data from endpoint %s: %v", endpoint, err)
 		return nil, err
 	}
 
 	var billing CopilotBilling
 	err = client.Get(fmt.Sprintf("%s/billing/seats", endpoint), &billing)
 	if err != nil {
-		logrus.Debugf("Error fetching billing data from endpoint %s: %v", endpoint, err)
+		logger.Debugf("Error fetching billing data from endpoint %s: %v", endpoint, err)
 		return nil, err
 	}
 
