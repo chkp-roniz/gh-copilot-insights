@@ -4,21 +4,25 @@ import (
 	"fmt"
 
 	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/api"
+	"github.com/cli/go-gh/pkg/auth"
+
+	// "github.com/cli/go-gh/pkg/api"
 	"github.com/sirupsen/logrus"
 )
 
 func determineEndpoint(scope string) (string, error) {
-	stdOut, stdErr, err := gh.Exec("auth", "token")
-	if err != nil {
-		logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
-		logrus.Debugf("%s", stdErr.String())
-		return "", err
-	}
-	opts := &api.ClientOptions{
-		AuthToken: stdOut.String(),
-	}
-	client, err := gh.RESTClient(opts)
+	// stdOut, stdErr, err := gh.Exec("auth", "token")
+	// if err != nil {
+	// 	logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
+	// 	logrus.Debugf("%s", stdErr.String())
+	// 	return "", err
+	// }
+	// opts := &api.ClientOptions{
+	// 	AuthToken: stdOut.String(),
+	// }
+	client, err := gh.RESTClient(nil)
+	token, source := auth.TokenForHost("github.com")
+	logrus.Debugf("Token: %s, Source: %s", token, source)
 	if err != nil {
 		logrus.Debugf("Error creating REST client: %v", err)
 		return "", err
@@ -276,16 +280,16 @@ func getInsights(scopeName, scopeType string, usage []CopilotUsage, metrics []Co
 }
 
 func FetchCopilotUsage(scopeName string) ([]Insight, error) {
-	stdOut, stdErr, err := gh.Exec("auth", "token")
-	if err != nil {
-		logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
-		logrus.Debugf("%s", stdErr.String())
-		return nil, err
-	}
-	opts := &api.ClientOptions{
-		AuthToken: stdOut.String(),
-	}
-	client, err := gh.RESTClient(opts)
+	// stdOut, stdErr, err := gh.Exec("auth", "token")
+	// if err != nil {
+	// 	logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
+	// 	logrus.Debugf("%s", stdErr.String())
+	// 	return nil, err
+	// }
+	// opts := &api.ClientOptions{
+	// 	AuthToken: stdOut.String(),
+	// }
+	client, err := gh.RESTClient(nil)
 	if err != nil {
 		logrus.Debugf("Error creating REST client: %v", err)
 		return nil, err
