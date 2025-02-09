@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cli/go-gh"
+	"github.com/cli/go-gh/pkg/api"
 	"github.com/sirupsen/logrus"
 )
 
@@ -264,7 +265,16 @@ func getInsights(scopeName, scopeType string, usage []CopilotUsage, metrics []Co
 }
 
 func FetchCopilotUsage(scopeName string) ([]Insight, error) {
-	client, err := gh.RESTClient(nil)
+	stdOut, stdErr, err := gh.Exec("auth", "token")
+	if err != nil {
+		logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
+		logrus.Debugf("%s", stdErr.String())
+		return nil, err
+	}
+	opts := &api.ClientOptions{
+		AuthToken: stdOut.String(),
+	}
+	client, err := gh.RESTClient(opts)
 	if err != nil {
 		logrus.Debugf("Error creating REST client: %v", err)
 		return nil, err
