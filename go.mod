@@ -1,8 +1,6 @@
 module github.com/chkp-roniz/gh-copilot-insights
 
-go 1.22.0
-
-toolchain go1.23.6
+go 1.17
 
 require (
 	github.com/cli/go-gh v1.2.1
