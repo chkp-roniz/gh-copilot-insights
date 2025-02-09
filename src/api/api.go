@@ -9,9 +9,18 @@ import (
 )
 
 func determineEndpoint(scope string) (string, error) {
-	client, err := gh.RESTClient(nil)
+	stdOut, stdErr, err := gh.Exec("auth", "token")
 	if err != nil {
-		logrus.Errorf("Error creating REST client: %v", err)
+		logrus.Debugf("Error retriving access token from GitHub Copilot: %v", err)
+		logrus.Debugf("%s", stdErr.String())
+		return "", err
+	}
+	opts := &api.ClientOptions{
+		AuthToken: stdOut.String(),
+	}
+	client, err := gh.RESTClient(opts)
+	if err != nil {
+		logrus.Debugf("Error creating REST client: %v", err)
 		return "", err
 	}
 

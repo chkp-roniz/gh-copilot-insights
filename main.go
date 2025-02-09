@@ -35,7 +35,8 @@ func main() {
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"scope": *scope,
-		}).Errorf("Error fetching Copilot usage: %v", err)
+		}).Debugf("Error: %v", err)
+		fmt.Println("Error fetching Copilot insights. Please try again.")
 		os.Exit(1)
 	}
 
