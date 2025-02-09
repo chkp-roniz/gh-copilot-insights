@@ -27,20 +27,22 @@ func determineEndpoint(scope string) (string, error) {
 	// Check if the scope is an organization
 	orgEndpoint := fmt.Sprintf("orgs/%s", scope)
 	var orgResponse map[string]interface{}
-	err = client.Get(orgEndpoint, &orgResponse)
-	if err == nil && orgResponse != nil {
+	err1 := client.Get(orgEndpoint, &orgResponse)
+	if err1 == nil && orgResponse != nil {
 		return "orgs", nil
 	}
 
 	// Check if the scope is an enterprise
 	enterpriseEndpoint := fmt.Sprintf("enterprises/%s/properties/schema", scope)
 	var enterpriseResponse []map[string]interface{}
-	err = client.Get(enterpriseEndpoint, &enterpriseResponse)
-	if err == nil && enterpriseResponse != nil {
+	err2 := client.Get(enterpriseEndpoint, &enterpriseResponse)
+	if err2 == nil && enterpriseResponse != nil {
 		return "enterprises", nil
 	}
 
 	logrus.Debugf("Invalid scope: %s", scope)
+	logrus.Debugf("Error orgs: %v", err1)
+	logrus.Debugf("Error enterprises: %v", err1)
 	return "", fmt.Errorf("invalid scope: %s", scope)
 }
 
